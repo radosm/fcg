@@ -72,19 +72,21 @@ function substraction(imageA,imageB,result)
     {
         var h=imageA.height;
         var w=imageA.width;
-        var pxR=[0,0,0,255]; // Pixel resultado, alfa=255
-        console.log('alto='+h);
-        console.log('ancho='+w);
+        var pxR=[0,0,0,255]; // Pixel resultado, siempre con alfa=255
+
         for (x=0;x<h;x++)
         {
             for (y=0; y<w; y++)
             {
+                // Obtiene los pixels x,y de cada imagen
                 pxA=getPixel(imageA,x,y);
                 pxB=getPixel(imageB,x,y);
                 alfaA=pxA[ALFA]/255;
-                pxR[ROJO]=Math.abs(pxA[ROJO]*alfaA-pxB[ROJO])
-                pxR[VERDE]=Math.abs(pxA[VERDE]*alfaA-pxB[VERDE])
-                pxR[AZUL]=Math.abs(pxA[AZUL]*alfaA-pxB[AZUL])
+                // Calcula la resta en los 3 canales
+                pxR[ROJO]=Math.abs(pxA[ROJO]*alfaA-pxB[ROJO]);
+                pxR[VERDE]=Math.abs(pxA[VERDE]*alfaA-pxB[VERDE]);
+                pxR[AZUL]=Math.abs(pxA[AZUL]*alfaA-pxB[AZUL]);
+                // Guarda el resultado
                 putPixel(result,x,y,pxR);
             }
         }
