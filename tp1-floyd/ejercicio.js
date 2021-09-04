@@ -60,7 +60,7 @@ function dither(image, factor)
         {
             px=getPixel(image,x,y);
             // Deja sólo el componente verde y 25% opacidad
-            px[ROJO]=0; px[AZUL]=0; px[ALFA]=64;
+            // px[ROJO]=0; px[AZUL]=0; px[ALFA]=64;
             putPixel(image,x,y,px);
         }
     }
@@ -69,5 +69,24 @@ function dither(image, factor)
 // Imágenes a restar (imageA y imageB) y el retorno en result
 function substraction(imageA,imageB,result) 
 {
-    // completar
+    {
+        var h=imageA.height;
+        var w=imageA.width;
+        var pxR=[0,0,0,255]; // Pixel resultado, alfa=255
+        console.log('alto='+h);
+        console.log('ancho='+w);
+        for (x=0;x<h;x++)
+        {
+            for (y=0; y<w; y++)
+            {
+                pxA=getPixel(imageA,x,y);
+                pxB=getPixel(imageB,x,y);
+                alfaA=pxA[ALFA]/255;
+                pxR[ROJO]=Math.abs(pxA[ROJO]*alfaA-pxB[ROJO])
+                pxR[VERDE]=Math.abs(pxA[VERDE]*alfaA-pxB[VERDE])
+                pxR[AZUL]=Math.abs(pxA[AZUL]*alfaA-pxB[AZUL])
+                putPixel(result,x,y,pxR);
+            }
+        }
+    }    
 }
