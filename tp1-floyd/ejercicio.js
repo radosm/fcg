@@ -8,25 +8,53 @@ const VERDE=1
 const AZUL=2
 const ALFA=3
 
-// Devuelve un array con la paleta según el factor
-function getPaleta(factor) 
-{
-    // Calcula el salto
-    var step=Math.round(256/factor);
-    // Para evitar valores mayores a 255 antes del último valor de la paleta
-    if (256-step*factor < 0) step=step-1;
-    // El primer valor de la paleta es 0
-    var p=[0];
-    // Agrega todos los valores antes del 255
-    var c=step;
-    for (i=1;i<factor;i++) {
-        p.push(c);
-        c=c+step;
+const getPaleta = (factor) => {
+    const step = 255 / factor;
+
+    let paleta = [];
+
+    for(let i = 0; i <= factor; i++)
+        paleta.push(Math.round(i * step));
+
+    // console.log('paleta: ',  paleta);
+    // console.log('step: ', step);
+
+    return paleta;
+}
+
+const nearestAvailableColor = (pixel, paleta) => {
+    let err = [255, 255, 255];
+    let bestColor = [0, 0, 0];
+    let minErr = [255, 255, 255];
+    
+    for(let i = 0; i < paleta.length; i++){
+        err[ROJO] = pixel[ROJO] - paleta[i];
+        err[VERDE] = pixel[VERDE] - paleta[i];
+        err[AZUL] = pixel[AZUL] - paleta[i];
+
+        //console.log(err);
+
+        if(Math.abs(err[ROJO]) < Math.abs(minErr[ROJO])){
+            bestColor[ROJO] = paleta[i];
+            minErr[ROJO] = err[ROJO];
+        }
+
+        if(Math.abs(err[VERDE]) < Math.abs(minErr[VERDE])){
+            bestColor[VERDE] = paleta[i];
+            minErr[VERDE] = err[VERDE];
+        }
+        
+        if(Math.abs(err[AZUL]) < Math.abs(minErr[AZUL])){
+            bestColor[AZUL] = paleta[i];
+            minErr[AZUL] = err[AZUL];
+        }
     }
-    // Pone el último valor (255)
-    p.push(255);
-    // Devuelve la paleta
-    return p;
+
+    bestColor.push(pixel[ALFA]);
+
+    //console.log(bestColor);
+
+    return [bestColor, minErr];
 }
 
 // Devuelve un array de 4 bytes [r,g,b,a]
@@ -45,29 +73,64 @@ function putPixel(image,x,y,px)
    for(i=0;i<4;i++) image.data[desde+i]=px[i];
 }
 
+function addError(px, err, coef){
+    px[ROJO]  = Math.round(px[ROJO]  + coef * err[ROJO]);
+    px[VERDE] = Math.round(px[VERDE] + coef * err[VERDE]);
+    px[AZUL]  = Math.round(px[AZUL]  + coef * err[AZUL]);
+}
+
+const validPixel = (x, y, h, w) => (x >= 0 && y >= 0 && x < h && x < w)
+
 function dither(image, factor)
 {
-    var p=getPaleta(factor);
-    var h=image.height;
-    var w=image.width;
+    let h = image.height;
+    let w =image.width;
+
+    let paleta = getPaleta(factor);
+
     console.log('factor='+factor);
-    console.log('paleta='+p);
     console.log('alto='+h);
     console.log('ancho='+w);
+
     for (x=0;x<h;x++)
     {
         for (y=0; y<w; y++)
         {
-            px=getPixel(image,x,y);
-            // Deja sólo el componente verde y 25% opacidad
-            // px[ROJO]=0; px[AZUL]=0; px[ALFA]=64;
-            putPixel(image,x,y,px);
+            let [newPx, err] = nearestAvailableColor(getPixel(image, x, y), paleta);
+            let px;
+            //console.log(err);
+
+            if(validPixel(x + 1, y, h, w)){
+                px = getPixel(image, x + 1, y);
+                addError(px, err, 7/16);
+                putPixel(image, x + 1, y, px);
+            }
+
+            if(validPixel(x - 1, y + 1, h, w)){
+                px = getPixel(image, x - 1, y + 1);
+                addError(px, err, 3/16);
+                putPixel(image, x - 1, y + 1, px);
+            }
+
+            if(validPixel(x, y + 1, h, w)){
+                px = getPixel(image, x, y + 1);
+                addError(px, err, 5/16);
+                putPixel(image, x, y + 1, px);
+            }
+
+            if(validPixel(x + 1, y + 1, h, w)){
+                px = getPixel(image, x + 1, y + 1);
+                addError(px, err, 1/16);
+                putPixel(image, x + 1, y + 1, px);
+            }
+        
+            putPixel(image, x, y, newPx);
         }
     }
 }
 
 // Imágenes a restar (imageA y imageB) y el retorno en result
-function substraction(imageA,imageB,result) 
+function substraction(imageA, imageB, result) 
 {
     {
         var h=imageA.height;
@@ -87,7 +150,7 @@ function substraction(imageA,imageB,result)
                 pxR[VERDE]=Math.abs(pxA[VERDE]*alfaA-pxB[VERDE]);
                 pxR[AZUL]=Math.abs(pxA[AZUL]*alfaA-pxB[AZUL]);
                 // Guarda el resultado
-                putPixel(result,x,y,pxR);
+                putPixel(result, x, y, pxR);
             }
         }
     }    
