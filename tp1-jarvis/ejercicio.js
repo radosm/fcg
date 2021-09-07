@@ -23,9 +23,9 @@ function dither(image, factor)
     console.log('jarvis='+jarvis[2]);
     let newPx,err,px;
 
-    for (x=0;x<h;x++)
+    for (let y=0; y < w; y++)
     {
-        for (y=0; y<w; y++)
+        for (let x = 0; x < h; x++)
         {
             [newPx, err] = nearestAvailableColor(getPixel(image, x, y), paleta);
             for (let i=0;i<3;i++)
