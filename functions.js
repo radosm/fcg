@@ -63,7 +63,7 @@ const putPixel = (image, x, y, px) => {
     let w = image.width;
     let desde = 4 * (x * w + y);
     
-    for(let i = 0; i < 4; i++) 
+    for(let i = 0; i < 4; i++)
         image.data[desde + i] = px[i];
 }
 
@@ -75,4 +75,4 @@ const addError = (px, err, coef) =>{
 }
 
 // Devuelve true si un pixel está dentro de la imagen
-const validPixel = (x, y, h, w) => (x >= 0 && y >= 0 && x < h && x < w)
+const validPixel = (x, y, h, w) => (x >= 0 && y >= 0 && y < h && x < w)
