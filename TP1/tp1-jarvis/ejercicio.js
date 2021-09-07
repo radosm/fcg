@@ -14,6 +14,8 @@ function dither(image, factor)
     let w =image.width;
     let paleta = getPaleta(factor);
 
+    let floatImage = getDitherFloat(image, w, h);
+
     console.log('factor='+factor);
     console.log('alto='+h);
     console.log('ancho='+w);
@@ -23,11 +25,11 @@ function dither(image, factor)
     console.log('jarvis='+jarvis[2]);
     let newPx,err,px;
 
-    for (let y=0; y < w; y++)
+    for (let x = 0; x < h; x++)
     {
-        for (let x = 0; x < h; x++)
+        for (let y=0; y < w; y++)
         {
-            [newPx, err] = nearestAvailableColor(getPixel(image, x, y), paleta);
+            [newPx, err] = nearestAvailableColor(getPixel(floatImage, x, y), paleta);
             for (let i=0;i<3;i++)
             {
                 for (let j=0;j<5;j++)
@@ -40,9 +42,9 @@ function dither(image, factor)
                     let vx=x+i;
                     let vy=y+j-2;
                     if (validPixel(vx, vy, h, w)){
-                        px = getPixel(image, vx, vy);
+                        px = getPixel(floatImage, vx, vy);
                         addError(px, err, coef/48);
-                        putPixel(image, vx, vy, px);
+                        putPixel(floatImage, vx, vy, px);
                     }
                 }
             }
