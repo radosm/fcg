@@ -50,10 +50,10 @@ const nearestAvailableColor = (pixel, paleta) => {
 // Devuelve un pixel en forma de array de 4 bytes [r,g,b,a]
 const getPixel = (image, x, y) => {
     let w = image.width;
-    let px=[];
+    let px = new Float32Array(4);
     
     for(let i = 0; i < 4; i++)
-        px.push(image.data[4 * (x * w + y) + i]);
+        px[i] = (image.data[4 * (x * w + y) + i]);
 
     return px;
 }
@@ -67,11 +67,29 @@ const putPixel = (image, x, y, px) => {
         image.data[desde + i] = px[i];
 }
 
+const getDitherFloat = (image, w, h) => {
+    let newData = new Float32Array(image.data.length);
+
+    let newImage = {
+        data: newData,
+        width: w,
+        height: h
+    }
+
+    for(let i = 0; i < image.data.length; i++){
+        newImage.data[i] = image.data[i];
+    }
+    
+    console.log(newImage);
+
+    return newImage;
+}
+
 // Suma el error multiplicado por el coeficiente al pixel
-const addError = (px, err, coef) =>{
-    px[ROJO]  = Math.round(px[ROJO]  + coef * err[ROJO]);
-    px[VERDE] = Math.round(px[VERDE] + coef * err[VERDE]);
-    px[AZUL]  = Math.round(px[AZUL]  + coef * err[AZUL]);
+const addError = (px, err, coef) => {
+    px[ROJO]  = px[ROJO]  + coef * err[ROJO];
+    px[VERDE] = px[VERDE] + coef * err[VERDE];
+    px[AZUL]  = px[AZUL]  + coef * err[AZUL];
 }
 
 // Devuelve true si un pixel está dentro de la imagen

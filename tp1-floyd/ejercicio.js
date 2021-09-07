@@ -4,42 +4,46 @@
 
 function dither(image, factor){
     let h = image.height;
-    let w =image.width;
+    let w = image.width;
     let paleta = getPaleta(factor);
+
+    let floatImage = getDitherFloat(image, w, h);
 
     console.log('Factor:', factor);
     console.log('Alto:', h);
     console.log('Ancho:', w);
 
-    for (y = 0; y < w; y++){
+    for (let y = 0; y < w; y++){
         for (let x = 0; x < h; x++){
-            let [newPx, err] = nearestAvailableColor(getPixel(image, x, y), paleta);
+            let [newPx, err] = nearestAvailableColor(getPixel(floatImage, x, y), paleta);
             let px;
 
             if(validPixel(x + 1, y, h, w)){
-                px = getPixel(image, x + 1, y);
+                px = getPixel(floatImage, x + 1, y);
+                //console.log(px);
                 addError(px, err, 7/16);
-                putPixel(image, x + 1, y, px);
+                putPixel(floatImage, x + 1, y, px);
             }
 
             if(validPixel(x - 1, y + 1, h, w)){
-                px = getPixel(image, x - 1, y + 1);
+                px = getPixel(floatImage, x - 1, y + 1);
                 addError(px, err, 3/16);
-                putPixel(image, x - 1, y + 1, px);
+                putPixel(floatImage, x - 1, y + 1, px);
             }
 
             if(validPixel(x, y + 1, h, w)){
-                px = getPixel(image, x, y + 1);
+                px = getPixel(floatImage, x, y + 1);
                 addError(px, err, 5/16);
-                putPixel(image, x, y + 1, px);
+                putPixel(floatImage, x, y + 1, px);
             }
 
             if(validPixel(x + 1, y + 1, h, w)){
-                px = getPixel(image, x + 1, y + 1);
+                px = getPixel(floatImage, x + 1, y + 1);
                 addError(px, err, 1/16);
-                putPixel(image, x + 1, y + 1, px);
+                putPixel(floatImage, x + 1, y + 1, px);
             }
 
+            //console.log(newPx);
             putPixel(image, x, y, newPx);
         }
     }
