@@ -25,10 +25,10 @@ function dither(image, factor)
     console.log('jarvis='+jarvis[2]);
     let newPx,err,px;
 
-    for (let x = 0; x < h; x++)
+    for (let y=0; y < h; y++)
     {
-        for (let y=0; y < w; y++)
-        {
+        for (let x = 0; x < w; x++)
+        {        
             [newPx, err] = nearestAvailableColor(getPixel(floatImage, x, y), paleta);
             for (let i=0;i<3;i++)
             {
@@ -39,8 +39,8 @@ function dither(image, factor)
                     if (coef==0) { 
                         continue;
                     }
-                    let vx=x+i;
-                    let vy=y+j-2;
+                    let vx=x+j-2;
+                    let vy=y+i;
                     if (validPixel(vx, vy, h, w)){
                         px = getPixel(floatImage, vx, vy);
                         addError(px, err, coef/48);

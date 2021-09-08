@@ -13,8 +13,8 @@ function dither(image, factor){
     console.log('Alto:', h);
     console.log('Ancho:', w);
 
-    for (let y = 0; y < w; y++){
-        for (let x = 0; x < h; x++){
+    for (let y = 0; y < h; y++){
+        for (let x = 0; x < w; x++){
             let [newPx, err] = nearestAvailableColor(getPixel(floatImage, x, y), paleta);
             let px;
 
