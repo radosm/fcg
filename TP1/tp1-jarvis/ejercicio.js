@@ -59,9 +59,10 @@ function substraction(imageA, imageB, result) {
     var w = imageA.width;
     var pxR=[0,0,0,255]; // Pixel resultado, siempre con alfa=255
 
-    for (x=0;x<h;x++)
+    
+    for (y=0; y<h; y++)
     {
-        for (y=0; y<w; y++)
+        for (x=0;x<w;x++)
         {
             // Obtiene los pixels x,y de cada imagen
             pxA=getPixel(imageA,x,y);
