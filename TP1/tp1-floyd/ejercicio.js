@@ -13,8 +13,8 @@ function dither(image, factor){
     console.log('Alto:', h);
     console.log('Ancho:', w);
 
-    for (let y = 0; y < w; y++){
-        for (let x = 0; x < h; x++){
+    for (let y = 0; y < h; y++){
+        for (let x = 0; x < w; x++){
             let [newPx, err] = nearestAvailableColor(getPixel(floatImage, x, y), paleta);
             let px;
 
@@ -55,9 +55,10 @@ function substraction(imageA, imageB, result) {
     var w = imageA.width;
     var pxR=[0,0,0,255]; // Pixel resultado, siempre con alfa=255
 
-    for (x=0;x<h;x++)
+   
+    for (y=0; y<h; y++)
     {
-        for (y=0; y<w; y++)
+        for (x=0;x<w;x++)
         {
             // Obtiene los pixels x,y de cada imagen
             pxA=getPixel(imageA,x,y);

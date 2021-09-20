@@ -53,7 +53,7 @@ const getPixel = (image, x, y) => {
     let px = new Float32Array(4);
     
     for(let i = 0; i < 4; i++)
-        px[i] = (image.data[4 * (x * w + y) + i]);
+        px[i] = (image.data[4 * (y * w + x) + i]);
 
     return px;
 }
@@ -61,7 +61,7 @@ const getPixel = (image, x, y) => {
 // Reemplaza el pixel x,y de una imagen
 const putPixel = (image, x, y, px) => {
     let w = image.width;
-    let desde = 4 * (x * w + y);
+    let desde = 4 * (y * w + x);
     
     for(let i = 0; i < 4; i++)
         image.data[desde + i] = px[i];
