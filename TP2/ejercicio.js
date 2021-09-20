@@ -22,7 +22,7 @@ function BuildTransform( positionX, positionY, rotation, scale )
 // primero trans1 y luego trans2. 
 function ComposeTransforms( trans1, trans2 )
 {
-	return(productoEscalar(fila(trans2,0),columna(trans1,0))
+	return Array(productoEscalar(fila(trans2,0),columna(trans1,0))
 	,productoEscalar(fila(trans2,1),columna(trans1,0))
 	,productoEscalar(fila(trans2,2),columna(trans1,0))
 	,productoEscalar(fila(trans2,0),columna(trans1,1))
