@@ -11,8 +11,9 @@
 // Las rotaciones vienen expresadas en grados. 
 function BuildTransform( positionX, positionY, rotation, scale )
 {	
-	return Array( scale*Math.cos(-rotation),scale*Math.sin(-rotation),0,
-	             -scale*Math.sin(-rotation),scale*Math.cos(-rotation),0,
+	radians=Math.PI*rotation/180;
+	return Array( scale*Math.cos(radians),scale*Math.sin(radians),0,
+	             -scale*Math.sin(radians),scale*Math.cos(radians),0,
 				  positionX               ,positionY               ,1);
 }
 
