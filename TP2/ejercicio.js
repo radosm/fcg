@@ -11,10 +11,10 @@
 // Las rotaciones vienen expresadas en grados. 
 function BuildTransform( positionX, positionY, rotation, scale )
 {	
-	radians=Math.PI*rotation/180;
-	return Array( scale*Math.cos(radians),scale*Math.sin(radians),0,
-	             -scale*Math.sin(radians),scale*Math.cos(radians),0,
-				  positionX               ,positionY               ,1);
+	let radians = Math.PI * rotation / 180;
+	return Array( scale * Math.cos(radians), scale * Math.sin(radians), 0,
+	             -scale * Math.sin(radians), scale * Math.cos(radians), 0,
+				  positionX                , positionY                , 1);
 }
 
 // Esta función retorna una matriz que resula de la composición de trasn1 y trans2. Ambas 
@@ -23,25 +23,51 @@ function BuildTransform( positionX, positionY, rotation, scale )
 // primero trans1 y luego trans2. 
 function ComposeTransforms( trans1, trans2 )
 {
-	return Array(productoEscalar(fila(trans2,0),columna(trans1,0))
-	,productoEscalar(fila(trans2,1),columna(trans1,0))
-	,productoEscalar(fila(trans2,2),columna(trans1,0))
-	,productoEscalar(fila(trans2,0),columna(trans1,1))
-	,productoEscalar(fila(trans2,1),columna(trans1,1))
-	,productoEscalar(fila(trans2,2),columna(trans1,1))
-	,productoEscalar(fila(trans2,0),columna(trans1,2))
-	,productoEscalar(fila(trans2,1),columna(trans1,2))
-	,productoEscalar(fila(trans2,2),columna(trans1,2)));
+	return toArray(matrixMultiply(toMatrix(trans1), toMatrix(trans2)));
 }
 
-function fila( m, n) {
-	return m.filter((e,i)=>{return i%3==n});
+const newMatrix = () => {
+	let matrix = Array();
+	for(let i = 0; i < 3; i++)
+		matrix.push(new Array(3));
+	
+	for(let i = 0; i < 9; i++)
+		matrix[Math.floor(i / 3)][i % 3] = 0;
+
+	return matrix;
 }
 
-function columna( m, n) {
-	return m.slice(3*n,3*n+3);
+const toMatrix = ( array ) => {
+	let matrix = newMatrix();
+
+	for(let i = 0; i < 9; i++)
+		matrix[Math.floor(i / 3)][i % 3] = array[i];
+
+	return matrix;
 }
 
-function productoEscalar(p,q){
-	return p.reduce((p,e,i)=>{ return p+e*q[i]},0);
+const toArray = ( matrix ) => {
+	let array = Array();
+
+	for(let x = 0; x < 3; x++){
+		for(let y = 0; y < 3; y++){
+			array.push(matrix[x][y]);
+		}
+	}
+
+	return array;
+}
+
+const matrixMultiply = ( matrix1, matrix2 ) => {
+	let result = newMatrix();
+
+	for(let x = 0; x < 3; x++){
+		for(let y = 0; y < 3; y++){
+			for(let k = 0; k < 3; k++){
+				result[x][y] += matrix1[x][k] * matrix2[k][y];
+			}
+		}
+	}
+
+	return result;
 }
