@@ -23,7 +23,7 @@ function BuildTransform( positionX, positionY, rotation, scale )
 // primero trans1 y luego trans2. 
 function ComposeTransforms( trans1, trans2 )
 {
-	return toArray(matrixMultiply(toMatrix(trans1), toMatrix(trans2)));
+	return toArray(matrixMultiply(toMatrix(trans2), toMatrix(trans1)));
 }
 
 const newMatrix = () => {
@@ -64,7 +64,7 @@ const matrixMultiply = ( matrix1, matrix2 ) => {
 	for(let x = 0; x < 3; x++){
 		for(let y = 0; y < 3; y++){
 			for(let k = 0; k < 3; k++){
-				result[x][y] += matrix1[x][k] * matrix2[k][y];
+				result[x][y] += matrix1[k][y] * matrix2[x][k];
 			}
 		}
 	}
