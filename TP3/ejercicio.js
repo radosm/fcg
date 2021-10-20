@@ -7,8 +7,9 @@ class CurveDrawer
 	{
 		// Creamos el programa webgl con los shaders para los segmentos de recta
 		this.prog   = InitShaderProgram( curvesVS, curvesFS );
-		this.pos    = Array(4);
+		this.pos    = [];
 		this.mvp    = gl.getUniformLocation( this.prog, 'mvp' );
+
 		this.pos[0] = gl.getUniformLocation( this.prog, 'p0' );
 		this.pos[1] = gl.getUniformLocation( this.prog, 'p1' );
 		this.pos[2] = gl.getUniformLocation( this.prog, 'p2' );
@@ -16,20 +17,21 @@ class CurveDrawer
 
 		// Obtenemos la ubicación del muestreo de t
 		this.tPos  = gl.getAttribLocation( this.prog, 't' );
-
-		// Creamos el buffer para el muestreo de t
-		this.buffer = gl.createBuffer();
-				
+		
 		// Muestreo del parámetro t
-		this.steps = 100;
+		this.steps = 50;
 		var tv = [];
 		for ( var i=0; i<this.steps; ++i ) {
 			tv.push( i / (this.steps-1) );
 		}
-		
+
+		console.log(tv);
+
 		// Creacion del vertex buffer y seteo de contenido
+		this.buffer = gl.createBuffer();
+
 		gl.bindBuffer( gl.ARRAY_BUFFER, this.buffer );
-		gl.bufferData( gl.ARRAY_BUFFER, new Float32Array(this.tv), gl.STATIC_DRAW);
+		gl.bufferData( gl.ARRAY_BUFFER, new Float32Array(tv), gl.STATIC_DRAW);
 
 	}
 
@@ -57,7 +59,7 @@ class CurveDrawer
 		for(var i=0;i<4;i++){
 			var x = pt[i].getAttribute("cx");
 			var y = pt[i].getAttribute("cy");
-			gl.uniform2fv(this.pos[i],new Float32Array([x,y]));
+			gl.uniform2fv(this.pos[i], [x,y]);
 		}		
 	}
 
@@ -65,6 +67,8 @@ class CurveDrawer
 	{
 		// Seleccionamos el shader
 		gl.useProgram( this.prog );
+
+		gl.bindBuffer( gl.ARRAY_BUFFER, this.buffer );
 
 		// Habilitamos el atributo 
 		gl.vertexAttribPointer( this.tPos, 1, gl.FLOAT, false, 0, 0 );
@@ -91,9 +95,12 @@ var curvesVS = `
 	void main()
 	{
 		float t2 = t * t;
-		float one_minus_t = 1.0 - t;
-		float one_minus_t2 = one_minus_t * one_minus_t;		
-		gl_Position = mvp * vec4(p0 * one_minus_t2 * one_minus_t + p1 * 3.0 * t * one_minus_t2 + p2 * 3.0 * t2 * one_minus_t + p3 * t2 * t,0,1);
+		float t3 = t2 * t;
+		float it = 1.0 - t;
+		float it2 = it * it;
+		float it3 = it2 * it;
+		vec2 pos = p0 * it3 + p1 * 3.0 * t * it2 + p2 * 3.0 * t2 * it + p3 * t3;
+		gl_Position = mvp * vec4(pos,0,1);
 	}
 `;
 
