@@ -19,13 +19,11 @@ class CurveDrawer
 		this.tPos  = gl.getAttribLocation( this.prog, 't' );
 		
 		// Muestreo del parámetro t
-		this.steps = 50;
+		this.steps = 100;
 		var tv = [];
 		for ( var i=0; i<this.steps; ++i ) {
 			tv.push( i / (this.steps-1) );
 		}
-
-		console.log(tv);
 
 		// Creacion del vertex buffer y seteo de contenido
 		this.buffer = gl.createBuffer();
