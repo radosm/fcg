@@ -7,8 +7,18 @@ class CurveDrawer
 	{
 		// Creamos el programa webgl con los shaders para los segmentos de recta
 		this.prog   = InitShaderProgram( curvesVS, curvesFS );
+		this.pos    = Array(4);
+		this.mvp    = gl.getUniformLocation( this.prog, 'mvp' );
+		this.pos[0] = gl.getUniformLocation( this.prog, 'p0' );
+		this.pos[1] = gl.getUniformLocation( this.prog, 'p1' );
+		this.pos[2] = gl.getUniformLocation( this.prog, 'p2' );
+		this.pos[3] = gl.getUniformLocation( this.prog, 'p3' );
 
-		// [Completar] Incialización y obtención de las ubicaciones de los atributos y variables uniformes
+		// Obtenemos la ubicación del muestreo de t
+		this.tPos  = gl.getAttribLocation( this.prog, 't' );
+
+		// Creamos el buffer para el muestreo de t
+		this.buffer = gl.createBuffer();
 				
 		// Muestreo del parámetro t
 		this.steps = 100;
@@ -17,14 +27,25 @@ class CurveDrawer
 			tv.push( i / (this.steps-1) );
 		}
 		
-		// [Completar] Creacion del vertex buffer y seteo de contenido
+		// Creacion del vertex buffer y seteo de contenido
+		gl.bindBuffer( gl.ARRAY_BUFFER, this.buffer );
+		gl.bufferData( gl.ARRAY_BUFFER, new Float32Array(this.tv), gl.STATIC_DRAW);
+
 	}
 
 	// Actualización del viewport (se llama al inicializar la web o al cambiar el tamaño de la pantalla)
 	setViewport( width, height )
 	{
-		// [Completar] Matriz de transformación.
-		// [Completar] Binding del programa y seteo de la variable uniforme para la matriz. 
+		// Calculamos la matriz de proyección.
+		// Como nos vamos a manejar únicamente en 2D, no tiene sentido utilizar perspectiva. 
+		// Simplemente inicializamos la matriz para que escale los elementos de la escena
+		// al ancho y alto del canvas, invirtiendo la coordeanda y. La matriz está en formato 
+		// column-major.
+		var trans = [ 2/width,0,0,0,  0,-2/height,0,0, 0,0,1,0, -1,1,0,1 ];
+
+		// Seteamos la matriz en la variable unforme del shader
+		gl.useProgram( this.prog );
+		gl.uniformMatrix4fv( this.mvp, false, trans );
 	}
 
 	updatePoints( pt )
@@ -32,14 +53,24 @@ class CurveDrawer
 		// [Completar] Actualización de las variables uniformes para los puntos de control
 		// [Completar] No se olviden de hacer el binding del programa antes de setear las variables 
 		// [Completar] Pueden acceder a las coordenadas de los puntos de control consultando el arreglo pt[]:
-		// var x = pt[i].getAttribute("cx");
-		// var y = pt[i].getAttribute("cy");
+		gl.useProgram( this.prog );
+		for(var i=0;i<4;i++){
+			var x = pt[i].getAttribute("cx");
+			var y = pt[i].getAttribute("cy");
+			gl.uniform2fv(this.pos[i],new Float32Array([x,y]));
+		}		
 	}
 
 	draw()
 	{
-		// [Completar] Dibujamos la curva como una LINE_STRIP
-		// [Completar] No se olviden de hacer el binding del programa y de habilitar los atributos de los vértices
+		// Seleccionamos el shader
+		gl.useProgram( this.prog );
+
+		// Habilitamos el atributo 
+		gl.vertexAttribPointer( this.tPos, 1, gl.FLOAT, false, 0, 0 );
+		gl.enableVertexAttribArray( this.tPos );
+
+		gl.drawArrays( gl.LINE_STRIP, 0, this.steps );
 	}
 }
 
@@ -49,15 +80,20 @@ class CurveDrawer
 // declarás las variables pero no las usás, no se les asigna espacio. Siempre poner ; al finalizar las sentencias. Las constantes
 // en punto flotante necesitan ser expresadas como X.Y, incluso si son enteros: ejemplo, para 4 escribimos 4.0
 var curvesVS = `
+    precision mediump float;
 	attribute float t;
 	uniform mat4 mvp;
 	uniform vec2 p0;
 	uniform vec2 p1;
 	uniform vec2 p2;
 	uniform vec2 p3;
+	
 	void main()
-	{ 
-		gl_Position = vec4(0,0,0,1);
+	{
+		float t2 = t * t;
+		float one_minus_t = 1.0 - t;
+		float one_minus_t2 = one_minus_t * one_minus_t;		
+		gl_Position = mvp * vec4(p0 * one_minus_t2 * one_minus_t + p1 * 3.0 * t * one_minus_t2 + p2 * 3.0 * t2 * one_minus_t + p3 * t2 * t,0,1);
 	}
 `;
 
