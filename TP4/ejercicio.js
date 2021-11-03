@@ -118,6 +118,9 @@ class MeshDrawer
 		// [COMPLETAR] Actualizar el contenido del buffer de vértices
 		this.numTriangles = vertPos.length / 3;
 
+		this.vertexBuffer = gl.createBuffer();
+		this.textureBuffer = gl.createBuffer();
+
 		gl.bindBuffer( gl.ARRAY_BUFFER, this.vertexBuffer );
 		gl.bufferData( gl.ARRAY_BUFFER, new Float32Array(vertPos), gl.STATIC_DRAW);
 
