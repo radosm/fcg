@@ -102,6 +102,7 @@ class MeshDrawer
 		this.textureBuffer = gl.createBuffer();
 
 		this.texture = gl.createTexture();
+		this.showToggle = true;
 
 		gl.useProgram( this.prog );
 		gl.uniform1i( this.sampler, 0 );
@@ -181,7 +182,7 @@ class MeshDrawer
 
 		// Activo la textura
 		gl.useProgram( this.prog );
-		gl.uniform1i( this.show, true );
+		gl.uniform1i( this.show, this.showToggle );
 	}
 	
 	// Esta función se llama cada vez que el usuario cambia el estado del checkbox 'Mostrar textura'
@@ -191,6 +192,7 @@ class MeshDrawer
 		// [COMPLETAR] Setear variables uniformes en el fragment shader
 		gl.useProgram( this.prog );
 		gl.uniform1i( this.show, show );
+		this.showToggle = show;
 	}
 }
 
