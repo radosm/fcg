@@ -65,6 +65,25 @@ function GetModelViewMatrix( translationX, translationY, translationZ, rotationX
 {
 	// [COMPLETAR] Modificar el código para formar la matriz de transformación.
 
+	let cosX = Math.cos(rotationX), sinX = Math.sin(rotationX);
+	let cosY = Math.cos(rotationY), sinY = Math.sin(rotationY);
+
+	var rotX = [
+		1, 0, 0, 0,
+		0, cosX, -sinX, 0,
+		0, sinX, cosX, 0,
+		0, 0, 0, 1
+	];
+
+	var rotY = [
+		cosY, 0, sinY, 0,
+		0, 1, 0, 0,
+		-sinY, 0, cosY, 0,
+		0, 0, 0, 1
+	];
+
+	var rot = MatrixMult(rotX, rotY);
+
 	// Matriz de traslación
 	var trans = [
 		1, 0, 0, 0,
@@ -72,6 +91,8 @@ function GetModelViewMatrix( translationX, translationY, translationZ, rotationX
 		0, 0, 1, 0,
 		translationX, translationY, translationZ, 1
 	];
+
+	trans = MatrixMult(trans, rot);
 
 	var mv = trans;
 	return mv;
@@ -86,13 +107,31 @@ class MeshDrawer
 		// [COMPLETAR] inicializaciones
 
 		// 1. Compilamos el programa de shaders
+		this.program = InitShaderProgram( meshVS, meshFS );
 		
 		// 2. Obtenemos los IDs de las variables uniformes en los shaders
+		this.mvp = gl.getUniformLocation( this.program, "mvp" );
+		this.mv = gl.getUniformLocation( this.program, "mv" );
+		this.normalMatrix = gl.getUniformLocation( this.program, "mn" );
+		this.flip = gl.getUniformLocation( this.program, "flip" );
+		this.show = gl.getUniformLocation( this.program, "show" );
+		this.sampler = gl.getUniformLocation( this.program, "sampler" );
+		this.lightDir = gl.getUniformLocation( this.program, "lightDir" );
+		this.shininess = gl.getUniformLocation( this.program, "shininess" );
 
 		// 3. Obtenemos los IDs de los atributos de los vértices en los shaders
+		this.pos = gl.getAttribLocation( this.program, "pos" );
+		this.texCoord = gl.getAttribLocation( this.program, "texCoord" );
+		this.normCoord = gl.getAttribLocation( this.program, "normCoord" );
+		this.vertCoord = gl.getAttribLocation( this.program, "vertCoord" );
 
 		// 4. Creamos los buffers
 
+		this.vertexBuffer = gl.createBuffer();
+		this.normalBuffer = gl.createBuffer();
+		this.textureBuffer = gl.createBuffer();
+
+		this.texture = gl.createTexture();
 		// ...
 	}
 	
@@ -200,7 +239,7 @@ var meshVS = `
 
 	void main()
 	{ 
-		gl_Position = mvp * vec4(pos,1);
+		gl_Position = mvp * vec4(pos, 1);
 	}
 `;
 
