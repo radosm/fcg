@@ -115,6 +115,7 @@ class MeshDrawer
 		this.normalMatrix = gl.getUniformLocation( this.program, "mn" );
 		this.flip = gl.getUniformLocation( this.program, "flip" );
 		this.show = gl.getUniformLocation( this.program, "show" );
+		this.ambient = gl.getUniformLocation( this.program, "ambient" );
 		this.sampler = gl.getUniformLocation( this.program, "texGPU" );
 		this.lightDir = gl.getUniformLocation( this.program, "lightDir" );
 		this.shininess = gl.getUniformLocation( this.program, "shininess" );
@@ -174,6 +175,13 @@ class MeshDrawer
 		// [COMPLETAR] Setear variables uniformes en el vertex shader
 		gl.useProgram( this.program );
 		gl.uniform1i( this.flip, swap );
+	}
+
+	setAmbient( ambient )
+	{
+		// [COMPLETAR] Setear variables uniformes en el vertex shader
+		gl.useProgram( this.program );
+		gl.uniform1i( this.ambient, ambient );
 	}
 	
 	// Esta función se llama para dibujar la malla de triángulos
@@ -315,6 +323,7 @@ var meshFS = `
 	uniform mat3 mn;
 	uniform sampler2D texGPU;
 	uniform int show;
+	uniform int ambient;
 
 	varying vec2 vtexCoord;
 	varying vec3 vnormCoord;
@@ -336,10 +345,10 @@ var meshFS = `
 		vec4 white = vec4(1.0, 1.0, 1.0, 1.0);
 		vec4 Kd = (show == 0 ? white : texColor);
 		vec4 Ks = white;
-		vec4 Ka = white;
 		vec4 I = white;
-		vec4 Ia = vec4(0.005, 0.005, 0.005, 1.0);
+		vec4 Ia = vec4(0.1, 0.1, 0.1, 1.0);
+		vec4 Ka = Ia * Kd;
 
-		gl_FragColor = I * (Kd * diffuse + Ks * specular) + Ka * Ia;
+		gl_FragColor = I * (Kd * diffuse + Ks * specular) + (ambient != 0 ? Ka : vec4(0.0, 0.0, 0.0, 0.0));
 	}
 `;

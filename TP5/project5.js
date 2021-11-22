@@ -272,6 +272,13 @@ function SwapYZ( param )
 	DrawScene();
 }
 
+// Control de luz ambiente
+function Ambient( param )
+{
+	meshDrawer.setAmbient( param.checked );
+	DrawScene();
+}
+
 // Cargar archivo obj
 function LoadObj( param )
 {
