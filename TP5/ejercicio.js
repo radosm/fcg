@@ -343,13 +343,17 @@ var meshFS = `
 
 		vec4 texColor = texture2D(texGPU, vtexCoord);
 		vec4 white = vec4(1.0, 1.0, 1.0, 1.0);
-		vec4 black = vec4(0.0, 0.0, 0.0, (ambient == 0 ? 0.0: 1.0));
+
+		// Si queremos que no funda al fondo violeta, podemos poner el alpha de black en 1.0
+		vec4 black = vec4(0.0, 0.0, 0.0, 0.0);
+
 		vec4 Kd = (show == 0 ? white : texColor);
 		vec4 Ks = white;
 		vec4 I = white;
 		vec4 Ka = (ambient == 0 ? black : Kd);
-		vec4 Ia = vec4(0.05, 0.05, 0.05, 1.0);
 
-		gl_FragColor = I * (Kd * diffuse + Ks * specular) + Ia*Ka;
+		vec4 Ia = vec4(0.1, 0.1, 0.1, 1.0);
+		
+		gl_FragColor = I * (Kd * diffuse + Ks * specular) + Ia * Ka;
 	}
 `;
